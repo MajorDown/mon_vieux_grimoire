@@ -13,16 +13,24 @@ const bookSchema = new mongoose.Schema({
       grade: { type: Number, required: true },
     },
   ],
-  averageRating: { type: Number, default: 0 },
+  averageRating: {
+    type: Number,
+    default: function () {
+      const grades = this.ratings.map((rating) => rating.grade);
+      const average =
+        grades.reduce((total, grade) => total + grade, 0) / grades.length;
+      return average.toFixed(1);
+    },
+  },
 });
 
-bookSchema.methods.calcAverageRating = function () {
-  const grades = this.ratings.map((rating) => rating.grade);
+bookSchema.post("save", function (doc) {
+  const grades = doc.ratings.map((rating) => rating.grade);
   const average =
     grades.reduce((total, grade) => total + grade, 0) / grades.length;
-  this.averageRating = average.toFixed(1);
-  return this.averageRating;
-};
+  doc.averageRating = average.toFixed(1);
+  doc.save();
+});
 
 const Book = mongoose.model("Book", bookSchema);
 

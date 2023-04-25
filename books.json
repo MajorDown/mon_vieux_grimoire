@@ -1,0 +1,110 @@
+[
+    {
+        "_id": "6446d80df78ba69e3585895e",
+        "userId": "clc4wj5lh3gyi0ak4eq4n8syr",
+        "title": "Milwaukee Mission",
+        "author": "Elder Cooper",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2021,
+        "genre": "Policier",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d919f78ba69e35858961",
+        "userId": "clbxs3tag6jkr0biul4trzbrv",
+        "title": "Book for Esther",
+        "author": "Alabaster",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2022,
+        "genre": "Paysage",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d93ff78ba69e35858963",
+        "userId": "1",
+        "title": "The Kinfolk Table",
+        "author": "Nathan Williams",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2022,
+        "genre": "Cuisine",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d970f78ba69e35858965",
+        "userId": "1",
+        "title": "Milwaukee Mission",
+        "author": "Elder Cooper",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2021,
+        "genre": "Policier",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d99af78ba69e35858967",
+        "userId": "1",
+        "title": "Book for Esther",
+        "author": "Alabaster",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2022,
+        "genre": "Paysage",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d9bbf78ba69e35858969",
+        "userId": "1",
+        "title": "The Kinfolk Table",
+        "author": "Nathan Williams",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2022,
+        "genre": "Cuisine",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d9cdf78ba69e3585896b",
+        "userId": "1",
+        "title": "Milwaukee Mission",
+        "author": "Elder Cooper",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2021,
+        "genre": "Policier",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446d9e6f78ba69e3585896d",
+        "userId": "clc7s9xnh7zpt0ak4fisdwuj1",
+        "title": "Book for Esther",
+        "author": "Alabaster",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2022,
+        "genre": "Paysage",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    },
+    {
+        "_id": "6446e2f0116f76e16e21c675",
+        "userId": "clc4wj5lh3gyi0ak4eq4n8syr",
+        "title": "The Kinfolk Table",
+        "author": "Nathan Williams",
+        "imageUrl": "https://via.placeholder.com/206x260",
+        "year": 2022,
+        "genre": "Cuisine",
+        "averageRating": 0,
+        "ratings": [],
+        "__v": 0
+    }
+]
