@@ -15,12 +15,7 @@ const bookSchema = new mongoose.Schema({
   ],
   averageRating: {
     type: Number,
-    default: function () {
-      const grades = this.ratings.map((rating) => rating.grade);
-      const average =
-        grades.reduce((total, grade) => total + grade, 0) / grades.length;
-      return average.toFixed(1);
-    },
+    default: null,
   },
 });
 

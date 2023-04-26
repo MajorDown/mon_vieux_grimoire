@@ -1,3 +1,4 @@
+const { imageEraser } = require("../middlewares/imageEraser");
 const BookModel = require("../models/book.model");
 
 module.exports.getBooks = async (req, res) => {
@@ -10,8 +11,7 @@ module.exports.getBooks = async (req, res) => {
       res
         .status(204)
         .json({ message: "la DB ne possède pour l'instant aucun livres" });
-    }
-    res.status(200).json(books);
+    } else res.status(200).json(books);
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -55,31 +55,39 @@ module.exports.getBestBooks = async (req, res) => {
 
 module.exports.createBook = async (req, res) => {
   try {
+    // VERIFICATION DE LA PRESENCE D'UN CONTENU
     if (!req.body) {
-      res
+      return res
         .status(400)
-        .json({ message: "votre requète ne contient aucun livre" });
+        .json({ message: "Votre requête ne contient aucun livre" });
     }
-    const bookObject = JSON.parse(req.body.book);
+    // EXTRACTION DES DONNEES DU FORMDATA
+    const bookData = JSON.parse(req.body.book);
+    const { userId, title, author, year, genre, ratings } = bookData;
     let imageUrl = "";
+    // STOCKAGE DE L'URL DE L'IMAGE
     if (req.file) {
       imageUrl = `${req.protocol}://${req.get("host")}/images/${
         req.file.filename
       }`;
     }
+    // CREATION D'UN NOUVEAU BOOK
     const newBook = new BookModel({
-      userId: bookObject.userId,
-      title: bookObject.title,
-      author: bookObject.author,
-      imageUrl: imageUrl,
-      year: bookObject.year,
-      genre: bookObject.genre,
+      userId,
+      title,
+      author,
+      year,
+      genre,
+      imageUrl,
+      ratings,
     });
-
+    // ENVOI DU NOUVEAU BOOK DANS LA DB
     const createdBook = await newBook.save();
-    res.status(201).json("nouveau livre enregistré : " + createdBook);
+    res
+      .status(201)
+      .json({ message: "Nouveau livre enregistré", book: createdBook });
+    // GESTION DES ERREURS
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       message: "Une erreur s'est produite lors de la création du livre",
       err: err,
@@ -89,18 +97,38 @@ module.exports.createBook = async (req, res) => {
 
 module.exports.editBook = async (req, res) => {
   try {
-    const book = await BookModel.findById(req.params.id);
+    const bookId = req.params.id;
+    const book = await BookModel.findById(bookId);
     if (!book) {
-      res.status(400).json({ message: "aucun livre ne corespond à cet id" });
+      return res.status(404).json({ message: "Livre introuvable" });
     }
-    const updatedBook = await BookModel.findByIdAndUpdate(book, req.body, {
-      new: true,
+    // EXTRACTION DES DONNEES DU BODY
+    const { userId, title, author, year, genre } = req.body;
+    let imageUrl = book.imageUrl;
+    // STOCKAGE DE L'URL DE L'IMAGE
+    if (req.file) {
+      imageUrl = `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`;
+    }
+    // MISE A JOUR DU BOOK
+    book.userId = userId;
+    book.title = title;
+    book.author = author;
+    book.year = year;
+    book.genre = genre;
+    book.imageUrl = imageUrl;
+    // ENVOI DU BOOK ACTUALISE DANS LA DB
+    await BookModel.findByIdAndUpdate(bookId, book);
+    res.status(200).json({
+      message: "Livre mis à jour",
+      book: book,
     });
-    res.status(200).json({ message: "livre mis à jour : " + updatedBook });
+    // GESTION DES ERREURS
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({
-      message: "Une erreur s'est produite lors de la modification du livre",
+      message: "Une erreur s'est produite lors de la mise à jour du livre",
       err: err,
     });
   }
@@ -108,14 +136,12 @@ module.exports.editBook = async (req, res) => {
 
 module.exports.deleteBook = async (req, res) => {
   try {
-    const book = await BookModel.findById(req.params.id);
-    if (!book) {
-      res.status(400).json({ message: "aucun livre ne corespond à cet id" });
-    }
-    await book.deleteOne();
-    res.status(200).json({ message: "livre supprimé" });
+    const bookToDelete = await BookModel.findOneAndDelete({
+      _id: req.params.id,
+    });
+    console.log(bookToDelete);
+    res.status(202).json({ message: "livre supprimé" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       message: "Une erreur s'est produite lors de la suppression du livre",
       err: err,
@@ -125,28 +151,27 @@ module.exports.deleteBook = async (req, res) => {
 
 module.exports.rateBook = async (req, res) => {
   try {
-    const book = await BookModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        $addToSet: {
-          //si le userID a déja noté, la note ne sera pas ajouté
-          ratings: {
-            $cond: {
-              if: { $in: [req.body.userId, "$ratings.userId"] },
-              then: "$ratings",
-              else: { userId: req.body.userId, grade: req.body.grade },
-            },
-          },
-        },
-      },
-      { new: true }
-    );
-    res.status(200).json(book);
+    if (!req.body) {
+      return res
+        .status(400)
+        .json({ message: "Votre requête ne contient aucune note" });
+    }
+    const { userId, rating } = req.body;
+    const bookToRate = await BookModel.findById(req.params.id);
+    if (
+      bookToRate.ratings.some((rating) => {
+        return rating.userId === userId;
+      })
+    ) {
+      res.status(400).json({ message: "Vous avez déjà noté ce livre" });
+    }
+    bookToRate.ratings.push({ userId: userId, grade: rating });
+    await bookToRate.save();
+    res.status(200).json(bookToRate);
   } catch (err) {
     console.error(err);
     res.status(500).json({
-      message: "Une erreur s'est produite lors de la notation du livre",
-      err: err,
+      error: "Une erreur est survenue lors de la mise à jour de la note",
     });
   }
 };
