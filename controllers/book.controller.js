@@ -136,16 +136,33 @@ module.exports.editBook = async (req, res) => {
 
 module.exports.deleteBook = async (req, res) => {
   try {
-    const bookToDelete = await BookModel.findOneAndDelete({
-      _id: req.params.id,
-    });
-    console.log(bookToDelete);
-    res.status(202).json({ message: "livre supprimé" });
+    const bookToDelete = await BookModel.findById(req.params.id);
+    if (!bookToDelete) {
+      console.log("livre pas trouvé");
+    } else {
+      await BookModel.findOneAndRemove({ _id: req.params.id });
+      console.log("effaçage effectué");
+      imageEraser(bookToDelete.imageUrl);
+      console.log("image effacé");
+      res.status(202).json({ message: "livre supprimé" });
+      console.log("response envoyé");
+    }
   } catch (err) {
-    res.status(500).json({
-      message: "Une erreur s'est produite lors de la suppression du livre",
-      err: err,
-    });
+    console.error(err);
+    switch (err.name) {
+      case "DocumentNotFoundError":
+        console.log("erreur capté dans le switch");
+        res.status(404).json({
+          error: "Le livre que vous essayez de supprimer n'a pas été trouvé",
+        });
+        break;
+      default:
+        res.status(500).json({
+          error: "Une erreur est survenue lors de la suppression du livre",
+        });
+        break;
+    }
+    console.log("fin du controller");
   }
 };
 
