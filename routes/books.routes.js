@@ -1,6 +1,9 @@
 const express = require("express");
 const { tokenChecker } = require("../middlewares/tokenManager");
-const configMulter = require("../middlewares/configMulter");
+const {
+  imageUploader,
+  imageResizer,
+} = require("../middlewares/sharpAndMulter");
 const {
   getBooks,
   getBook,
@@ -15,8 +18,8 @@ const router = express.Router();
 router.get("/", getBooks);
 router.get("/bestrating", getBestBooks);
 router.get("/:id", getBook);
-router.post("/", tokenChecker, configMulter, createBook);
-router.put("/:id", tokenChecker, configMulter, editBook);
+router.post("/", tokenChecker, imageUploader, imageResizer, createBook);
+router.put("/:id", tokenChecker, imageUploader, imageResizer, editBook);
 router.delete("/:id", tokenChecker, deleteBook);
 router.post("/:id/rating", tokenChecker, rateBook);
 

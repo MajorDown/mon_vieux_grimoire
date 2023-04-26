@@ -141,7 +141,7 @@ module.exports.deleteBook = async (req, res) => {
       console.log("livre pas trouvé");
     } else {
       await BookModel.findOneAndRemove({ _id: req.params.id });
-      console.log("effaçage effectué");
+      console.log("book supprimé");
       imageEraser(bookToDelete.imageUrl);
       console.log("image effacé");
       res.status(202).json({ message: "livre supprimé" });
@@ -149,19 +149,9 @@ module.exports.deleteBook = async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    switch (err.name) {
-      case "DocumentNotFoundError":
-        console.log("erreur capté dans le switch");
-        res.status(404).json({
-          error: "Le livre que vous essayez de supprimer n'a pas été trouvé",
-        });
-        break;
-      default:
-        res.status(500).json({
-          error: "Une erreur est survenue lors de la suppression du livre",
-        });
-        break;
-    }
+    res.status(500).json({
+      error: "Une erreur est survenue lors de la suppression du livre",
+    });
     console.log("fin du controller");
   }
 };
