@@ -28,7 +28,7 @@ bookSchema.post("save", function (doc) {
   const grades = doc.ratings.map((rating) => rating.grade);
   const average =
     grades.reduce((total, grade) => total + grade, 0) / grades.length;
-  doc.averageRating = average.toFixed(1);
+  doc.averageRating = parseFloat(average.toFixed(1)); // convertir la note moyenne en nombre
   doc.save();
 });
 

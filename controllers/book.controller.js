@@ -43,7 +43,6 @@ module.exports.getBestBooks = async (req, res) => {
     const bestBooks = await BookModel.find()
       .sort({ averageRating: -1 })
       .limit(3);
-    console.log(bestBooks);
     res.status(200).json(bestBooks);
   } catch (err) {
     console.error(err);
@@ -54,22 +53,33 @@ module.exports.getBestBooks = async (req, res) => {
   }
 };
 
-module.exports.setBook = async (req, res) => {
+module.exports.createBook = async (req, res) => {
   try {
     if (!req.body) {
-      res.status(400).json({ message: "votre requète ne contient aucun live" });
+      res
+        .status(400)
+        .json({ message: "votre requète ne contient aucun livre" });
     }
-    const book = await BookModel.create({
-      userId: req.body.userId,
-      title: req.body.title,
-      author: req.body.author,
-      imageUrl: req.body.imageUrl,
-      year: req.body.year,
-      genre: req.body.genre,
+    const bookObject = JSON.parse(req.body.book);
+    let imageUrl = "";
+    if (req.file) {
+      imageUrl = `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`;
+    }
+    const newBook = new BookModel({
+      userId: bookObject.userId,
+      title: bookObject.title,
+      author: bookObject.author,
+      imageUrl: imageUrl,
+      year: bookObject.year,
+      genre: bookObject.genre,
     });
-    res.status(201).json("nouveau livre enregistré : " + book);
+
+    const createdBook = await newBook.save();
+    res.status(201).json("nouveau livre enregistré : " + createdBook);
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({
       message: "Une erreur s'est produite lors de la création du livre",
       err: err,
