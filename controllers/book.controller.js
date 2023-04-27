@@ -81,6 +81,11 @@ module.exports.createBook = async (req, res) => {
       imageUrl,
       ratings,
     });
+    // CALCULER AVERAGERATING
+    const grades = newBook.ratings.map((rating) => rating.grade);
+    const average =
+      grades.reduce((total, grade) => total + grade, 0) / grades.length;
+    newBook.averageRating = parseFloat(average.toFixed(1));
     // ENVOI DU NOUVEAU BOOK DANS LA DB
     const createdBook = await newBook.save();
     res
@@ -174,6 +179,12 @@ module.exports.rateBook = async (req, res) => {
       res.status(400).json({ message: "Vous avez déjà noté ce livre" });
     }
     bookToRate.ratings.push({ userId: userId, grade: rating });
+    // CALCULER AVERAGERATING
+    const grades = bookToRate.ratings.map((rating) => rating.grade);
+    const average =
+      grades.reduce((total, grade) => total + grade, 0) / grades.length;
+    bookToRate.averageRating = parseFloat(average.toFixed(1));
+    // ACTUALISATION DU BOOK DANS LA DB
     await bookToRate.save();
     res.status(200).json(bookToRate);
   } catch (err) {
