@@ -107,6 +107,7 @@ module.exports.editBook = async (req, res) => {
     let imageUrl = book.imageUrl;
     // STOCKAGE DE L'URL DE L'IMAGE
     if (req.file) {
+      imageEraser(imageUrl);
       imageUrl = `${req.protocol}://${req.get("host")}/images/${
         req.file.filename
       }`;
