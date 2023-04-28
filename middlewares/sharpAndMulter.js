@@ -21,6 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }).single("image");
 
+// REDIMENTIONNER L'IMAGE
 const imageResizer = (req, res, next) => {
   if (!req.file) {
     return next();
@@ -46,6 +47,7 @@ const imageResizer = (req, res, next) => {
     });
 };
 
+// UPLOADER L'IMAGE
 const imageUploader = (req, res, next) => {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {

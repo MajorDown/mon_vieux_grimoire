@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/user.model");
 
-// Middleware pour générer le token JWT
+// GENERER LE TOKEN JWT
 module.exports.tokenMaker = (userId) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "24h",
@@ -9,10 +9,10 @@ module.exports.tokenMaker = (userId) => {
   return token;
 };
 
-// Middleware pour vérifier le token JWT
+// VERIFIER LE TOKEN JWT
 module.exports.tokenChecker = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1]; // récupération du token depuis le header
+    const token = req.headers.authorization.split(" ")[1];
     if (!token) {
       throw new Error("Vous n'êtes pas authentifié !");
     }

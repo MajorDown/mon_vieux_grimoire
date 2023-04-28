@@ -1,17 +1,24 @@
 const { imageEraser } = require("../middlewares/imageEraser");
 const BookModel = require("../models/book.model");
 
+// OBTENIR LES BOOKS
 module.exports.getBooks = async (req, res) => {
   try {
     const books = await BookModel.find();
+    // VERIFIER QUE LES BOOKS ONT ETE TROUVE
     if (!books) {
       res.status(400).json({ message: "Problême d'acquisition de la DB" });
     }
+    // SI LA LISTE NE CONTIENT PAS DE BOOK
     if (books.length === 0) {
       res
         .status(204)
         .json({ message: "la DB ne possède pour l'instant aucun livres" });
-    } else res.status(200).json(books);
+    } else {
+      // ENVOI VERS LE FRONT DE LA LISTE DE BOOK
+      res.status(200).json(books);
+    }
+    // GESTION DES ERREURS
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -21,14 +28,18 @@ module.exports.getBooks = async (req, res) => {
   }
 };
 
+// OBTENIR UN BOOK
 module.exports.getBook = async (req, res) => {
   try {
     const book = await BookModel.findById(req.params.id);
+    // VERIFIER QUE LE BOOK EST TROUVE
     if (!book) {
       res.status(404).json({ message: "aucun livre ne correspond à cet id" });
     } else {
+      // ENVOI AU FRONT LE BOOK TROUVE
       res.status(200).json(book);
     }
+    // GESTION DES ERREURS
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -38,12 +49,16 @@ module.exports.getBook = async (req, res) => {
   }
 };
 
+// OBTENIR LES 3 MEILLEURS BOOKS
 module.exports.getBestBooks = async (req, res) => {
   try {
+    // TROUVER LES 3 BOOKS LES MIEUX NOTES
     const bestBooks = await BookModel.find()
       .sort({ averageRating: -1 })
       .limit(3);
+    // ENVOIR AU FRONT DU CLASSEMENT
     res.status(200).json(bestBooks);
+    // GESTION DES ERREURS
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -53,6 +68,7 @@ module.exports.getBestBooks = async (req, res) => {
   }
 };
 
+// CREATION D'UN BOOK
 module.exports.createBook = async (req, res) => {
   try {
     // VERIFICATION DE LA PRESENCE D'UN CONTENU
@@ -100,10 +116,12 @@ module.exports.createBook = async (req, res) => {
   }
 };
 
+// MODIFIER UN BOOK
 module.exports.editBook = async (req, res) => {
   try {
     const bookId = req.params.id;
     const book = await BookModel.findById(bookId);
+    // VERIFIER SI LE BOOK EST TROUVE
     if (!book) {
       return res.status(404).json({ message: "Livre introuvable" });
     }
@@ -140,37 +158,42 @@ module.exports.editBook = async (req, res) => {
   }
 };
 
+// SUPPRIMER UN BOOK
 module.exports.deleteBook = async (req, res) => {
   try {
     const bookToDelete = await BookModel.findById(req.params.id);
+    // VERIFIER QUE LE BOOK A SUPPRIMER EXISTE
     if (!bookToDelete) {
       console.log("livre pas trouvé");
     } else {
+      // SUPPRESSION DU BOOK ET DE L'IMAGE ASSOCIEE
       await BookModel.findOneAndRemove({ _id: req.params.id });
-      console.log("book supprimé");
       imageEraser(bookToDelete.imageUrl);
-      console.log("image effacé");
       res.status(202).json({ message: "livre supprimé" });
-      console.log("response envoyé");
     }
+    // GESTION DES ERREURS
   } catch (err) {
+    // GESTION DES ERREURS
     console.error(err);
     res.status(500).json({
       error: "Une erreur est survenue lors de la suppression du livre",
     });
-    console.log("fin du controller");
   }
 };
 
+// NOTER UN BOOK
 module.exports.rateBook = async (req, res) => {
   try {
+    // VERIFIER QUE LE BODY CONTIENT UNE DATA
     if (!req.body) {
       return res
         .status(400)
         .json({ message: "Votre requête ne contient aucune note" });
     }
+    // EXTRAIRE LES DATA
     const { userId, rating } = req.body;
     const bookToRate = await BookModel.findById(req.params.id);
+    // VERIFIER SI L'UTILISATEUR A DEJA NOTE LE BOOK
     if (
       bookToRate.ratings.some((rating) => {
         return rating.userId === userId;
@@ -178,6 +201,7 @@ module.exports.rateBook = async (req, res) => {
     ) {
       res.status(400).json({ message: "Vous avez déjà noté ce livre" });
     }
+    // AJOUTER LA NOUVELLE NOTE
     bookToRate.ratings.push({ userId: userId, grade: rating });
     // CALCULER AVERAGERATING
     const grades = bookToRate.ratings.map((rating) => rating.grade);
@@ -188,6 +212,7 @@ module.exports.rateBook = async (req, res) => {
     await bookToRate.save();
     res.status(200).json(bookToRate);
   } catch (err) {
+    // GESTION DES ERREURS
     console.error(err);
     res.status(500).json({
       error: "Une erreur est survenue lors de la mise à jour de la note",
